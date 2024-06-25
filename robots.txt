@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /?
+Disallow: /*?
+Disallow: /*?page=
+Disallow: /cgi-bin*
+Disallow: /functions/sitemap-generation.php
+Allow: /*.css
+Allow: /*.js
+
+Host: https://yourdomain.com
+Sitemap: https://yourdomain.com/sitemap.xml

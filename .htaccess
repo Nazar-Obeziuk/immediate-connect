@@ -1,0 +1,46 @@
+RewriteEngine On
+
+# Не перенаправлять на страницу 404
+RewriteRule ^functions/sitemap-generation/$ /functions/sitemap-generation.php [L]
+
+#Перепаправление с www на без www
+RewriteCond %{HTTP_HOST} ^www\.(.*)$
+RewriteRule ^(.*)$ http://%1/$1 [L,R=301]
+
+# Перенаправление с index/ на корневой URL
+RewriteRule ^index/?$ / [R=301,L]
+
+# Удаление лишних слешей
+RewriteCond %{THE_REQUEST} //
+RewriteRule ^.*$ /$0 [R=301,L]
+
+# Перенаправляем запросы на скрипт для преобразования в нижний регистр
+RewriteCond %{REQUEST_URI} [A-Z]
+RewriteRule . /functions/lowercase_redirect.php [L]
+
+# Перенаправляем запросы для .php на версию без расширения и со слешем в конце для всех языков
+RewriteCond %{THE_REQUEST} \s/(.+?)\.php[\s?/] [NC]
+RewriteRule ^ /%1/ [R=301,L,NE]
+
+# Для запросов без языкового префикса и без слеша в конце - добавляем слеш и перезаписываем на PHP файл
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/$1.php -f
+RewriteRule ^(.*?[^/])$ /$1/ [R=301,L]
+
+# Для запросов с языковым префиксом и без слеша в конце - добавляем слеш и перезаписываем на PHP файл
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/$1/$2.php -f
+RewriteRule ^(ru|es)/(.+[^/])$ /$1/$2/ [R=301,L]
+
+# Перезаписываем запросы с завершающим слешем на соответствующий файл .php для корневого каталога
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{DOCUMENT_ROOT}/$1.php -f
+RewriteRule ^([^/.]+)/$ /$1.php [NC,L]
+
+# Перезаписываем запросы с завершающим слешем на соответствующий файл .php для языковых каталогов
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{DOCUMENT_ROOT}/$1/$2.php -f
+RewriteRule ^(ru|es)/([^/.]+)/$ /$1/$2.php [NC,L]
+
+# Редирект на страницу 404 если она не найдена
+ErrorDocument 404 /404.php
